@@ -1,0 +1,517 @@
+import React, { useState, useEffect } from "react";
+
+export default function App() {
+  const [unlocked, setUnlocked] = useState(false);
+  const [answer, setAnswer] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showGreeting, setShowGreeting] = useState(false);
+
+  // Счётчик совместной жизни (начиная с 2005 года)
+  const startDate = new Date(2005, 7, 15);
+  const [timeTogether, setTimeTogether] = useState({
+    years: 0,
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const updateCounter = () => {
+      const now = new Date();
+      const diff = now - startDate;
+
+      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+      const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeTogether({ years, days, hours, minutes, seconds });
+    };
+
+    updateCounter();
+    const interval = setInterval(updateCounter, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Слайды с поддержкой загрузки фотографий или встроенных артов
+  const [slides, setSlides] = useState([
+    {
+      id: 1,
+      title: "Любовь в сердце",
+      subtitle: "Hawaii Resort & Park",
+      date: "Лето",
+      quote: "Сквозь годы — главное, что ваш взгляд всё так же полон тепла и нежности.",
+      tag: "Романтика",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-sky-400 via-emerald-300 to-emerald-600 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <rect x="80" y="20" width="240" height="35" rx="5" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="2" />
+            <text x="200" y="44" textAnchor="middle" fill="#1e293b" fontSize="22" fontWeight="900" letterSpacing="6">HAWAII</text>
+            <path d="M 50 70 L 100 70 L 100 450 L 50 450 Z" fill="#dc2626" />
+            <path d="M 200 400 C 100 300 60 220 60 160 C 60 110 100 80 150 80 C 180 80 200 100 200 100 C 200 100 220 80 250 80 C 300 80 340 110 340 160 C 340 220 300 300 200 400 Z" fill="#dc2626" />
+            <g transform="translate(140, 210)">
+              <circle cx="35" cy="40" r="16" fill="#fbcfe8" />
+              <path d="M 20 35 C 20 20 50 20 50 35 Z" fill="#1e293b" />
+              <rect x="23" y="55" width="24" height="60" fill="#ffffff" rx="5" />
+              <rect x="23" y="115" width="24" height="65" fill="#0f172a" rx="3" />
+              <circle cx="28" cy="40" r="3" fill="#0f172a" />
+              <circle cx="85" cy="35" r="17" fill="#fed7aa" />
+              <rect x="68" y="18" width="34" height="10" fill="#0f172a" rx="2" />
+              <rect x="73" y="52" width="26" height="63" fill="#ffffff" rx="5" />
+              <rect x="73" y="115" width="26" height="65" fill="#475569" rx="3" />
+              <circle cx="80" cy="35" r="3" fill="#0f172a" />
+              <path d="M 45 70 Q 65 65 75 70" stroke="#fed7aa" strokeWidth="6" strokeLinecap="round" />
+            </g>
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-white/80 bg-black/40 px-3 py-1 rounded-full backdrop-blur-md">
+            ❤️ Hawaii Resort
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 2,
+      title: "Вместе к новым вершинам",
+      subtitle: "Jannat & Burana Resort",
+      date: "Теплые дни",
+      quote: "Секрет идеальной семьи — уметь быть не просто супругами, но и лучшими друзьями.",
+      tag: "Гармония",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-sky-300 via-amber-100 to-emerald-200 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <rect x="40" y="80" width="320" height="200" fill="#f1f5f9" rx="8" stroke="#cbd5e1" strokeWidth="3" />
+            <polygon points="200,20 160,80 240,80" fill="#0f766e" />
+            <rect x="185" y="35" width="30" height="45" fill="#0d9488" />
+            <g transform="translate(110, 230)">
+              <circle cx="50" cy="45" r="18" fill="#fbcfe8" />
+              <rect x="35" y="63" width="30" height="70" fill="#ffffff" rx="6" />
+              <rect x="35" y="133" width="30" height="85" fill="#0f172a" rx="4" />
+              <circle cx="115" cy="40" r="19" fill="#fed7aa" />
+              <rect x="95" y="20" width="40" height="12" fill="#1e293b" rx="3" />
+              <rect x="100" y="59" width="30" height="74" fill="#ffffff" rx="6" />
+              <rect x="100" y="133" width="30" height="85" fill="#475569" rx="4" />
+            </g>
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-slate-800 bg-white/70 px-3 py-1 rounded-full backdrop-blur-md font-semibold">
+            🏨 Jannat & Burana Resort
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 3,
+      title: "Зимняя сказка и огни",
+      subtitle: "Новогодняя Площадь",
+      date: "Зимний вечер",
+      quote: "Даже в самые холодные зимние вечера ваше тепло согревает весь наш дом.",
+      tag: "Уют & Тепло",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <polygon points="320,100 240,320 400,320" fill="#f59e0b" opacity="0.8" />
+            <circle cx="320" cy="90" r="8" fill="#fef08a" />
+            <g transform="translate(80, 180)">
+              <rect x="80" y="110" width="130" height="150" fill="#0f172a" rx="20" />
+              <circle cx="145" cy="85" r="32" fill="#fed7aa" />
+              <path d="M 110 75 C 110 40 180 40 180 75 Z" fill="#1e1b4b" />
+              <rect x="180" y="130" width="90" height="130" fill="#3f6212" rx="15" />
+              <circle cx="215" cy="100" r="28" fill="#fbcfe8" />
+            </g>
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-amber-300 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-amber-500/30">
+            ❄️ Winter Festive
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 4,
+      title: "Мамина забота и нежность",
+      subtitle: "Апам жана эжем",
+      date: "Солнечный день",
+      quote: "Апаке, сиздин мээримиңиз жана жылуулугуңуз биздин үй-бүлөнүн эң чоң байлыгы!",
+      tag: "Эне Мээрими",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-amber-100 via-rose-100 to-amber-200 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <circle cx="200" cy="150" r="100" fill="#fef3c7" opacity="0.6" />
+            <g transform="translate(70, 120)">
+              {/* Мама и Сестра арт */}
+              <circle cx="90" cy="80" r="35" fill="#fed7aa" />
+              <path d="M 55 70 C 55 35 125 35 125 70 Z" fill="#1e293b" />
+              <rect x="50" y="115" width="80" height="150" fill="#1e1b4b" rx="20" />
+              <circle cx="200" cy="90" r="32" fill="#fbcfe8" />
+              <path d="M 170 80 C 170 50 230 50 230 80 Z" fill="#0f172a" />
+              <rect x="165" y="122" width="70" height="140" fill="#1e293b" rx="18" />
+            </g>
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-rose-800 bg-white/80 px-3 py-1 rounded-full backdrop-blur-md font-medium">
+            👩‍👧‍👦 Мама и Сестра
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 5,
+      title: "Отцовская гордость и радость",
+      subtitle: "Атам жана иним",
+      date: "Прогулка",
+      quote: "Ата — үй-бүлөнүн тиреги. Сиздин даанышмандыгыңыз жана үлгүңүз үчүн рахмат!",
+      tag: "Ата Мээрими",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-sky-200 via-emerald-100 to-emerald-300 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <g transform="translate(60, 100)">
+              {/* Папа в калпаке с малышом */}
+              <rect x="140" y="18" width="70" height="35" fill="#f8fafc" rx="5" stroke="#0f172a" strokeWidth="3" />
+              <polygon points="175,5 140,20 210,20" fill="#0f172a" />
+              <circle cx="175" cy="70" r="35" fill="#fed7aa" />
+              <rect x="130" y="105" width="90" height="160" fill="#334155" rx="20" />
+              <circle cx="90" cy="110" r="25" fill="#fbcfe8" />
+              <rect x="65" y="135" width="50" height="80" fill="#d97706" rx="15" />
+            </g>
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-slate-800 bg-white/80 px-3 py-1 rounded-full backdrop-blur-md font-medium">
+            👨‍👦 Папа в Ак-калпаке с братишкой
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 6,
+      title: "Главные достижения детей",
+      subtitle: "Выпускной день",
+      date: "Праздник",
+      quote: "Сиздердин тарбияңыздар жана колдооңуздар бизди ар дайым жаңы бийиктиктерге шыктандырат!",
+      tag: "Сыймык",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-blue-300 via-sky-100 to-amber-100 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <g transform="translate(70, 90)">
+              <circle cx="100" cy="110" r="30" fill="#fbcfe8" />
+              <rect x="70" y="140" width="60" height="140" fill="#ffffff" rx="10" stroke="#cbd5e1" strokeWidth="2" />
+              <circle cx="120" cy="180" r="25" fill="#dc2626" />
+              <rect x="190" y="25" width="65" height="30" fill="#f8fafc" stroke="#0f172a" strokeWidth="3" />
+              <circle cx="220" cy="75" r="35" fill="#fed7aa" />
+              <rect x="175" y="110" width="90" height="170" fill="#e2e8f0" rx="15" />
+            </g>
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-slate-800 bg-white/80 px-3 py-1 rounded-full backdrop-blur-md font-medium">
+            🎓 Выпускной день
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 7,
+      title: "Теплый семейный дасторкон",
+      subtitle: "Үй-бүлөлүк кеч",
+      date: "Уютный вечер",
+      quote: "Бардык балдарыңыз бир дасторкондо чогулганда — бул эң чоң бакыт жана майрам!",
+      tag: "Береке",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-amber-900 via-amber-800 to-amber-950 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <ellipse cx="200" cy="300" rx="160" ry="90" fill="#78350f" stroke="#b45309" strokeWidth="6" />
+            <circle cx="200" cy="280" r="35" fill="#fef08a" />
+            <circle cx="140" cy="270" r="18" fill="#fca5a5" />
+            <circle cx="260" cy="270" r="18" fill="#fca5a5" />
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-amber-200 bg-black/60 px-3 py-1 rounded-full backdrop-blur-md border border-amber-500/30">
+            🍲 Семейный Дасторкон
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 8,
+      title: "Солнечный отдых на Иссык-Куле",
+      subtitle: "Ысык-Көл & Үй-бүлө",
+      date: "Летний отдых",
+      quote: "Көлдүн жээгиндеги унутулгус көз ирмемдер. Бирге өткөргөн ар бир күнүбүз баалуу!",
+      tag: "Ысык-Көл",
+      customImage: null,
+      renderArt: () => (
+        <div className="w-full h-full bg-gradient-to-b from-sky-400 via-cyan-300 to-blue-600 relative overflow-hidden flex items-center justify-center">
+          <svg viewBox="0 0 400 500" className="w-full h-full">
+            <circle cx="80" cy="80" r="45" fill="#fef08a" />
+            <rect x="0" y="300" width="400" height="200" fill="#2563eb" opacity="0.8" />
+            <rect x="50" y="260" width="300" height="40" fill="#b45309" rx="5" />
+          </svg>
+          <div className="absolute bottom-2 text-[10px] text-sky-100 bg-blue-950/70 px-3 py-1 rounded-full backdrop-blur-md">
+            🌊 Отдых на Иссык-Куле
+          </div>
+        </div>
+      )
+    }
+  ]);
+
+  const handleImageUpload = (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const updated = [...slides];
+        updated[index].customImage = reader.result;
+        setSlides(updated);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  useEffect(() => {
+    let timer;
+    if (unlocked && isPlaying) {
+      timer = setInterval(() => {
+        setActiveSlide((prev) => (prev + 1) % slides.length);
+      }, 5000);
+    }
+    return () => clearInterval(timer);
+  }, [unlocked, isPlaying, slides.length]);
+
+  const handleUnlock = (e) => {
+    e.preventDefault();
+    if (answer.trim() === "2005") {
+      setUnlocked(true);
+      setErrorMsg("");
+    } else {
+      setErrorMsg("Неверно! Небольшая подсказка: это был 2005 год ❤️");
+    }
+  };
+
+  if (!unlocked) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-4 relative overflow-hidden font-sans">
+        <div className="absolute inset-0 bg-gradient-to-tr from-rose-950/40 via-purple-950/20 to-slate-950 pointer-events-none"></div>
+
+        <div className="relative z-10 max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-8 shadow-2xl text-center">
+          <div className="w-20 h-20 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner">
+            💖
+          </div>
+
+          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-rose-400 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2">
+            Семейная История
+          </h1>
+          <p className="text-slate-400 text-sm mb-6">
+            Введите секретный код для доступа к вашей личной Love Story
+          </p>
+
+          <form onSubmit={handleUnlock} className="space-y-4">
+            <div className="text-left">
+              <label className="block text-xs font-semibold text-rose-300 uppercase tracking-wider mb-2">
+                Контрольный вопрос:
+              </label>
+              <div className="text-base font-medium text-slate-200 bg-slate-800/80 p-3 rounded-xl border border-slate-700 mb-3">
+                Когда вы познакомились?
+              </div>
+              <input
+                type="text"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="Введите год (например, 2005)"
+                className="w-full bg-slate-950/80 border border-rose-500/40 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500 transition text-center font-bold text-lg"
+              />
+            </div>
+
+            {errorMsg && (
+              <p className="text-rose-400 text-xs font-medium bg-rose-950/50 border border-rose-800/50 p-2.5 rounded-lg">
+                {errorMsg}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-rose-600/30 transform active:scale-95 transition duration-200"
+            >
+              Войти в Love Story ✨
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  const currentSlide = slides[activeSlide];
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col justify-between relative overflow-x-hidden">
+      {/* Верхняя навигация */}
+      <header className="relative z-20 px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+        <div className="flex items-center space-x-3">
+          <span className="text-2xl">💍</span>
+          <div>
+            <h2 className="font-bold text-base bg-gradient-to-r from-rose-300 to-pink-400 bg-clip-text text-transparent">
+              Годовщина Семьи
+            </h2>
+            <p className="text-[11px] text-slate-400">С 2005 года вместе</p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setShowGreeting(!showGreeting)}
+          className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold px-4 py-2 rounded-full transition flex items-center space-x-2"
+        >
+          <span>💌</span>
+          <span>{showGreeting ? "Закрыть письмо" : "Открытка с пожеланием"}</span>
+        </button>
+      </header>
+
+      {/* Модальное окно с открыткой (Русский и Кыргызский языки) */}
+      {showGreeting && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-rose-500/40 max-w-lg w-full rounded-3xl p-6 relative shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+            <button
+              onClick={() => setShowGreeting(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white text-xl"
+            >
+              ✕
+            </button>
+
+            <div className="text-center">
+              <span className="text-4xl">🕊️</span>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-rose-300 to-pink-300 bg-clip-text text-transparent mt-2">
+                С Годовщиной! / Мааракеңиздер менен!
+              </h3>
+            </div>
+
+            {/* Русский блок */}
+            <div className="bg-slate-800/60 p-4 rounded-2xl border border-rose-500/20 space-y-2">
+              <span className="text-xs font-bold text-rose-400 uppercase tracking-widest">🇷🇺 На русском:</span>
+              <p className="text-sm text-slate-200 leading-relaxed italic">
+                «Дорогие мама и папа! Поздравляю вас с вашей годовщиной! Спасибо вам за тот уют, тепло и любовь, которые вы создали в нашей семье. Глядя на вас, я понимаю, что такое настоящая поддержка, понимание и верность. Желаю вам бесконечного здоровья, радости, долгих лет счастья и чтобы ваша любовь с каждым днём становилась только крепче!»
+              </p>
+            </div>
+
+            {/* Кыргызский блок */}
+            <div className="bg-slate-800/60 p-4 rounded-2xl border border-rose-500/20 space-y-2">
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">🇰🇬 Кыргызча:</span>
+              <p className="text-sm text-slate-200 leading-relaxed italic">
+                «Урматтуу атам жана апам! Майрамыңыздар, мааракеңиздер кут болсун! Бизге көрсөткөн мээримиңиздер, туруктуулугуңуздар жана үй-бүлөдөгү жылуулук үчүн терең ыраазычылык билдирем. Сиздерге бекем ден соолук, узак өмүр, убакыт өткөн сайын бекемделген бактылуу жана ачык асман каалайм!»
+              </p>
+            </div>
+
+            <div className="text-center pt-2">
+              <p className="text-xs text-rose-400 font-semibold">С любовью от вашего программиста! ❤️</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Основной блок слайдера */}
+      <main className="max-w-4xl w-full mx-auto p-4 flex-1 flex flex-col justify-center">
+        {/* Живой счетчик */}
+        <div className="grid grid-cols-5 gap-2 text-center bg-slate-900/60 border border-slate-800 p-3 rounded-2xl backdrop-blur-sm mb-6">
+          <div>
+            <div className="text-xl md:text-2xl font-black text-rose-400">{timeTogether.years}</div>
+            <div className="text-[10px] uppercase text-slate-400 font-medium">Лет</div>
+          </div>
+          <div>
+            <div className="text-xl md:text-2xl font-black text-rose-400">{timeTogether.days}</div>
+            <div className="text-[10px] uppercase text-slate-400 font-medium">Дней</div>
+          </div>
+          <div>
+            <div className="text-xl md:text-2xl font-black text-rose-400">{timeTogether.hours}</div>
+            <div className="text-[10px] uppercase text-slate-400 font-medium">Часов</div>
+          </div>
+          <div>
+            <div className="text-xl md:text-2xl font-black text-rose-400">{timeTogether.minutes}</div>
+            <div className="text-[10px] uppercase text-slate-400 font-medium">Мин</div>
+          </div>
+          <div>
+            <div className="text-xl md:text-2xl font-black text-rose-400">{timeTogether.seconds}</div>
+            <div className="text-[10px] uppercase text-slate-400 font-medium">Сек</div>
+          </div>
+        </div>
+
+        {/* Слайд карточка */}
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2">
+          {/* Левый блок: Фото / Арт */}
+          <div className="relative h-72 md:h-96 w-full bg-slate-950 flex items-center justify-center overflow-hidden">
+            {currentSlide.customImage ? (
+              <img
+                src={currentSlide.customImage}
+                alt={currentSlide.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              currentSlide.renderArt()
+            )}
+
+            {/* Кнопка загрузки для замены фото */}
+            <label className="absolute bottom-3 right-3 bg-slate-900/80 hover:bg-slate-900 text-xs text-slate-200 border border-slate-700 px-3 py-1.5 rounded-xl cursor-pointer backdrop-blur-md transition flex items-center space-x-1 shadow-lg">
+              <span>📷</span>
+              <span>Загрузить фото</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageUpload(e, activeSlide)}
+              />
+            </label>
+          </div>
+
+          {/* Правый блок: Подпись и текст */}
+          <div className="p-6 md:p-8 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
+                  {currentSlide.tag}
+                </span>
+                <span className="text-xs text-slate-400">{currentSlide.date}</span>
+              </div>
+
+              <h3 className="text-2xl font-bold text-white mb-1">
+                {currentSlide.title}
+              </h3>
+              <p className="text-xs text-slate-400 mb-4">{currentSlide.subtitle}</p>
+
+              <blockquote className="text-slate-300 text-sm leading-relaxed italic border-l-2 border-rose-500 pl-4 py-1">
+                "{currentSlide.quote}"
+              </blockquote>
+            </div>
+
+            {/* Кнопки управления */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+              <div className="flex space-x-2">
+                {slides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveSlide(idx)}
+                    className={`h-2.5 rounded-full transition-all ${
+                      activeSlide === idx ? "w-8 bg-rose-500" : "w-2.5 bg-slate-700"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs transition"
+                >
+                  {isPlaying ? "⏸️ Пауза" : "▶️ Авто"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Футер */}
+      <footer className="py-4 text-center text-xs text-slate-500 border-t border-slate-900">
+        Сделано с любовью на 20-летие со дня знакомства (2005 - 2025/2026) ❤️
+      </footer>
+    </div>
+  );
+}
